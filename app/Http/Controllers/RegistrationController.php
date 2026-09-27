@@ -37,10 +37,7 @@ class RegistrationController extends Controller
                 'registration_deadline' => optional($reunion->registration_deadline)->toDateString(),
                 'registration_fee' => (float) $reunion->registration_fee,
             ],
-            'feeBreakdown' => [
-                'base' => (float) $reunion->registration_fee,
-                'perHead' => RegistrationFeeCalculator::perHeadFees($reunion),
-            ],
+            'feeBreakdown' => RegistrationFeeCalculator::breakdown($reunion),
             'paymentLookupUrl' => '/payments',
         ]);
     }
