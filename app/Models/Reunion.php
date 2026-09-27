@@ -16,6 +16,8 @@ class Reunion extends Model
         'registration_deadline',
         'is_active',
         'registration_fee',
+        'charge_type',
+        'charge_value',
     ];
 
     /**
@@ -30,6 +32,7 @@ class Reunion extends Model
             'registration_deadline' => 'date',
             'is_active' => 'boolean',
             'registration_fee' => 'decimal:2',
+            'charge_value' => 'decimal:2',
         ];
     }
 
@@ -56,5 +59,12 @@ class Reunion extends Model
             })
             ->orderBy('event_date')
             ->first();
+    }
+
+    public function isChargeEnabled(): bool
+    {
+        return $this->charge_type !== null
+            && $this->charge_value !== null
+            && (float) $this->charge_value > 0.0;
     }
 }
