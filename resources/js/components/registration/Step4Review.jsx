@@ -92,9 +92,25 @@ export default function Step4Review({ data, setData, errors, reunion, feeBreakdo
                         <dd className="text-right text-gray-900">{data.tshirt_size}</dd>
                     </div>
                 ) : null}
+                {feeBreakdown.subtotal != null ? (
+                    <>
+                        <div className="flex justify-between gap-3">
+                            <dt className="font-semibold text-gray-700">Subtotal</dt>
+                            <dd className="text-right text-gray-900">{formatBDT(feeBreakdown.subtotal)}</dd>
+                        </div>
+                        {feeBreakdown.chargeType ? (
+                            <div className="flex justify-between gap-3">
+                                <dt className="font-semibold text-gray-700">
+                                    Service Charge ({feeBreakdown.chargeType === 'percentage' ? `${feeBreakdown.chargeValue}%` : 'flat'})
+                                </dt>
+                                <dd className="text-right text-gray-900">{formatBDT(feeBreakdown.chargeAmount)}</dd>
+                            </div>
+                        ) : null}
+                    </>
+                ) : null}
                 <div className="flex justify-between gap-3 border-t border-gray-200 pt-2 text-base font-bold">
                     <dt>Total</dt>
-                    <dd>{formatBDT(total)}</dd>
+                    <dd>{formatBDT(feeBreakdown.total ?? total)}</dd>
                 </div>
             </dl>
 
