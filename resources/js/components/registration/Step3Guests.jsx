@@ -2,13 +2,21 @@ import { formatBDT } from '@/components/registration/utils/format';
 
 export default function Step3Guests({ data, setData, errors, feeBreakdown }) {
     const update = (field) => (e) => setData(field, e.target.value);
-    const adultCount = Number(data.guest_count_adult || 0);
-    const childCount = Number(data.guest_count_child || 0);
     const perHead = feeBreakdown.perHead || {};
-    const total =
+    const subtotal = Number(feeBreakdown.subtotal ?? feeBreakdown.base ?? 0);
+    const chargeAmount = Number(feeBreakdown.chargeAmount ?? 0);
+    const chargeType = feeBreakdown.chargeType ?? null;
+    const chargeValue = Number(feeBreakdown.chargeValue ?? 0);
+    const total = Number(feeBreakdown.total ?? subtotal);
+
+    // Live recompute of subtotal from per-head fees when the breakdown lacks
+    // a `subtotal` key (older shape). New breakdowns always include it.
+    const localSubtotal =
         Number(feeBreakdown.base || 0) +
-        (perHead.Adult ? perHead.Adult * adultCount : 0) +
-        (perHead.Child ? perHead.Child * childCount : 0);
+        (perHead.Adult ? perHead.Adult * Number(data.guest_count_adult || 0) : 0) +
+        (perHead.Child ? perHead.Child * Number(data.guest_count_child || 0) : 0);
+    const resolvedSubtotal = feeBreakdown.subtotal != null ? subtotal : localSubtotal;
+    const resolvedTotal = feeBreakdown.total != null ? total : resolvedSubtotal + chargeAmount;
 
     return (
         <div className="space-y-4">
@@ -70,8 +78,21 @@ export default function Step3Guests({ data, setData, errors, feeBreakdown }) {
                 </div>
             </div>
 
-            <div className="rounded-2xl bg-brand/10 px-4 py-3 text-sm font-semibold text-brand-ink">
-                Estimated total: {formatBDT(total)}
+            <div className="space-y-1 rounded-2xl bg-brand/10 px-4 py-3 text-sm font-semibold text-brand-ink">
+                <div className="flex justify-between">
+                    <span>Subtotal</span>
+                    <span>{formatBDT(resolvedSubtotal)}</span>
+                </div>
+                {chargeType ? (
+                    <div className="flex justify-between">
+                        <span>Service Charge ({chargeType === 'percentage' ? `${chargeValue}%` : 'flat'})</span>
+                        <span>{formatBDT(chargeAmount)}</span>
+                    </div>
+                ) : null}
+                <div className="flex justify-between border-t border-brand/30 pt-1 text-base">
+                    <span>Estimated total</span>
+                    <span>{formatBDT(resolvedTotal)}</span>
+                </div>
             </div>
         </div>
     );
