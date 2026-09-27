@@ -1,0 +1,91 @@
+<h2>Here's the full page in direction C — does the flow work?</h2>
+<p class="subtitle">Light hero, then About → Event Details → Testimonials → Registration → Sponsors → Footer. Scroll the preview top to bottom.</p>
+
+<style>
+  .pg { width: 260px; margin: 0 auto; border: 1px solid #ddd; border-radius: 18px; overflow: hidden; font-family: sans-serif; font-size: 11px; box-shadow: 0 2px 12px rgba(0,0,0,.08); background:#fff; }
+  .pg .bar { height: 26px; display:flex; align-items:center; justify-content:center; position: relative; font-weight:700; font-size:10px; background:#fff; border-bottom:1px solid #eee; }
+  .pg .burger { position:absolute; right:12px; top:9px; width:14px; height:2px; background:#000; box-shadow:0 4px 0 #000, 0 8px 0 #000; }
+  .pg .circle { width:74px; height:74px; border-radius:50%; border:4px solid #00BFFF; margin:16px auto 0; position:relative; }
+  .pg .circle::after { content:'SWAATC'; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:#00BFFF; color:#fff; padding:2px 7px; font-family:Georgia,serif; font-weight:700; letter-spacing:1px; white-space:nowrap; font-size:11px; }
+  .pg h5 { margin:10px 16px 4px; font-size:14px; line-height:1.25; text-align:center; }
+  .pg .sub { margin:0 20px 12px; text-align:center; line-height:1.45; color:#555; }
+  .pg .cta { display:block; text-align:center; padding:10px; border-radius:9px; font-weight:700; margin:2px 16px 18px; }
+  .pg .sec { padding:16px 0; }
+  .pg .sec-title { text-align:center; font-weight:800; font-size:12px; letter-spacing:.5px; text-transform:uppercase; margin:0 16px 10px; }
+  .pg .dcard { background:#fff; border:1px solid #e5e5e5; border-radius:10px; margin:0 16px 10px; padding:10px 12px; display:flex; gap:10px; align-items:center; }
+  .pg .ico { width:30px; height:30px; border-radius:8px; background:#e6f7ff; color:#0096c7; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+  .pg .dcard b { display:block; font-size:11px; }
+  .pg .dcard span { color:#666; }
+  .pg .quote { background:#fff; border-left:3px solid #00BFFF; border-radius:6px; margin:0 16px 8px; padding:8px 10px; font-style:italic; color:#444; }
+  .pg .qwho { font-style:normal; color:#999; font-size:10px; margin-top:4px; }
+  .pg .field { display:block; background:#fff; border-radius:7px; margin:0 16px 8px; padding:8px 10px; color:#999; }
+  .pg .foot { background:#000; color:#fff; padding:14px 16px; text-align:center; font-size:10px; line-height:1.6; }
+  .pg .spon { display:flex; gap:8px; justify-content:center; }
+  .pg .spon i { width:52px; height:26px; background:#eee; border-radius:5px; }
+</style>
+
+<div class="pg">
+  <div class="bar">SWAATC<span class="burger"></span></div>
+
+  <!-- HERO -->
+  <div class="sec" style="text-align:center;">
+    <div class="circle"></div>
+    <h5>Reconnect, Reflect, Rejoice</h5>
+    <div class="sub">SWAATC Reunion 2024 · Tejgaon College, Dhaka</div>
+    <span class="cta" style="background:#00BFFF; color:#000;">Register Now ↓</span>
+  </div>
+
+  <!-- ABOUT -->
+  <div class="sec" style="background:#fff; border-top:1px solid #eee;">
+    <div class="sec-title" style="color:#0096c7;">About the Association</div>
+    <p class="sub" style="text-align:left; margin-bottom:6px;">The Social Work Alumni Association of Tejgaon College (SWAATC) brings together graduates who share a commitment to community and service.</p>
+    <p class="sub" style="text-align:left;">The 2024 reunion marks our first full gathering in years — a day to reconnect with batchmates, honour our teachers, and celebrate the department's legacy.</p>
+  </div>
+
+  <!-- EVENT DETAILS -->
+  <div class="sec" style="background:#f5f6f7;">
+    <div class="sec-title">Event Details</div>
+    <div class="dcard"><div class="ico">📅</div><div><b>Date &amp; Time</b><span>[Date TBD], [Time TBD]</span></div></div>
+    <div class="dcard"><div class="ico">📍</div><div><b>Location</b><span>Tejgaon College Auditorium &amp; Campus</span></div></div>
+    <div class="dcard"><div class="ico">🎟️</div><div><b>Entry</b><span>[Registration / ticket info TBD]</span></div></div>
+  </div>
+
+  <!-- TESTIMONIALS -->
+  <div class="sec" style="background:#fff; border-top:1px solid #eee;">
+    <div class="sec-title" style="color:#0096c7;">From Past Reunions</div>
+    <div class="quote">"An unforgettable experience — like no time had passed at all."<div class="qwho">— Batch of 2005</div></div>
+    <div class="quote">"Proudest moment seeing our department honoured on stage."<div class="qwho">— Batch of 2010</div></div>
+  </div>
+
+  <!-- REGISTRATION -->
+  <div class="sec" style="background:#00BFFF;">
+    <div class="sec-title" style="color:#000;">Secure Your Spot</div>
+    <span class="field">Full name</span>
+    <span class="field">Batch / year</span>
+    <span class="field">Phone</span>
+    <span class="field">Email</span>
+    <span class="cta" style="background:#000; color:#fff; margin-bottom:16px;">Submit Registration</span>
+  </div>
+
+  <!-- SPONSORS -->
+  <div class="sec" style="border-top:1px solid #eee;">
+    <div class="sec-title" style="color:#999;">Our Partners</div>
+    <div class="spon"><i></i><i></i><i></i></div>
+  </div>
+
+  <div class="foot">
+    📘 Facebook group · ✉️ hello@swaatc.org<br/>© 2024 SWAATC — Social Work Alumni Association, Tejgaon College
+  </div>
+</div>
+
+<h3 style="margin-top:20px;">Which optional sections should we keep?</h3>
+<div class="options" data-multiselect>
+  <div class="option" data-choice="testimonials" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content"><h3>Testimonials</h3><p>Two short quotes (placeholder) from past attendees</p></div>
+  </div>
+  <div class="option" data-choice="sponsors" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content"><h3>Sponsors / Partners strip</h3><p>Placeholder logo tiles above the footer</p></div>
+  </div>
+</div>

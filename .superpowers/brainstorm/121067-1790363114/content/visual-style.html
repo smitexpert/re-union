@@ -1,0 +1,78 @@
+<h2>Which visual direction feels right for the landing page?</h2>
+<p class="subtitle">All three use the SWAATC brand blue (#00BFFF) and black. Phone-width previews below.</p>
+
+<style>
+  .phone { width: 240px; margin: 0 auto; border-radius: 18px; overflow: hidden; border: 1px solid #ddd; font-family: sans-serif; font-size: 11px; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+  .phone .bar { height: 22px; display:flex; align-items:center; justify-content:center; position: relative; font-weight: 700; font-size: 10px; }
+  .phone .bar .burger { position:absolute; right:10px; top:6px; width:14px; height:2px; background:currentColor; box-shadow: 0 4px 0 currentColor, 0 8px 0 currentColor; }
+  .phone .cta { display:block; text-align:center; padding:9px; border-radius:8px; font-weight:700; margin: 10px 14px 16px; }
+  .phone h4 { margin: 8px 14px 4px; line-height:1.25; }
+  .phone p { margin: 0 14px 10px; line-height:1.4; opacity:.85; }
+  .circle { width:90px; height:90px; border-radius:50%; border:5px solid #00BFFF; margin:14px auto 0; position:relative; }
+  .circle::after { content:'SWAATC'; position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:#00BFFF; color:#fff; padding:3px 8px; font-family: Georgia, serif; font-weight:700; letter-spacing:1px; white-space:nowrap; }
+  .cards .card { width: 32%; min-width: 280px; }
+</style>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:14px 0; background:#f4f4f4;">
+      <div class="phone">
+        <div class="bar" style="background:#fff; color:#000;">SWAATC<span class="burger"></span></div>
+        <div style="background:#00BFFF; color:#fff; padding:26px 0 6px; text-align:center;">
+          <div class="circle" style="border-color:#fff;"></div>
+          <h4 style="color:#fff; font-size:15px;">Reconnect, Reflect, Rejoice</h4>
+          <p style="color:#fff;">SWAATC Reunion 2024 — a historic gathering of Tejgaon College Social Work alumni.</p>
+        </div>
+        <div style="background:#fff; padding-top:6px;">
+          <span class="cta" style="background:#000; color:#fff;">Register Now</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Bold Brand Blue hero</h3>
+      <p>Solid brand-blue hero with white type, echoing the logo's banner. Strongest brand punch, no photo needed, loads instantly.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:14px 0; background:#f4f4f4;">
+      <div class="phone">
+        <div class="bar" style="background:#fff; color:#000;">SWAATC<span class="burger"></span></div>
+        <div style="background: linear-gradient(rgba(0,120,170,.82), rgba(0,120,170,.82)), repeating-linear-gradient(45deg,#9ad9ef 0 6px,#bfe8f5 6px 12px); color:#fff; padding:26px 0 6px; text-align:center;">
+          <div class="circle" style="border-color:#fff;"></div>
+          <h4 style="color:#fff; font-size:15px;">Reconnect, Reflect, Rejoice</h4>
+          <p style="color:#fff;">SWAATC Reunion 2024 — a historic gathering of Tejgaon College Social Work alumni.</p>
+        </div>
+        <div style="background:#fff; padding-top:6px;">
+          <span class="cta" style="background:#00BFFF; color:#000;">Register Now</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Photo hero with blue overlay</h3>
+      <p>Real campus/alumni photo behind a semi-transparent blue gradient, as the spec suggests. Warm and human; needs good photos supplied later.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:14px 0; background:#f4f4f4;">
+      <div class="phone">
+        <div class="bar" style="background:#fff; color:#000;">SWAATC<span class="burger"></span></div>
+        <div style="background:#fff; color:#000; padding:26px 0 6px; text-align:center;">
+          <div class="circle"></div>
+          <h4 style="font-size:15px;">Reconnect, Reflect, Rejoice</h4>
+          <p>SWAATC Reunion 2024 — a historic gathering of Tejgaon College Social Work alumni.</p>
+        </div>
+        <div style="background:#fff; padding-top:6px;">
+          <span class="cta" style="background:#00BFFF; color:#000;">Register Now</span>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Clean light hero</h3>
+      <p>White hero, blue accents, logo front and center. Calmest and most readable; least dramatic first impression.</p>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top:16px;">Tip: whichever you pick, the hero can switch to a real photo later without changing the structure.</p>

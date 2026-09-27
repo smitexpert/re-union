@@ -1,0 +1,64 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-serif: 'Lora', Georgia, 'Times New Roman', serif;
+
+    --color-brand: #00BFFF;
+    --color-brand-ink: #0077a3;
+    --color-mist: #f5f6f7;
+
+    --shadow-glow: 0 20px 40px -12px rgb(0 191 255 / 0.45);
+}
+
+:root {
+    color-scheme: light;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        scroll-behavior: auto;
+    }
+}
+
+body {
+    -webkit-tap-highlight-color: transparent;
+}
+
+a,
+button {
+    touch-action: manipulation;
+}
+
+::selection {
+    background-color: rgb(0 191 255 / 0.3);
+}
+
+@keyframes menu-in {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-menu-in {
+    animation: menu-in 0.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .animate-menu-in {
+        animation: none;
+    }
+}

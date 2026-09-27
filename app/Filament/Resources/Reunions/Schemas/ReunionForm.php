@@ -1,0 +1,32 @@
+<?php
+
+namespace App\Filament\Resources\Reunions\Schemas;
+
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Schema;
+
+class ReunionForm
+{
+    public static function configure(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                TextInput::make('title')
+                    ->required()
+                    ->maxLength(255),
+                DatePicker::make('event_date')
+                    ->required(),
+                DatePicker::make('registration_deadline'),
+                TextInput::make('registration_fee')
+                    ->required()
+                    ->numeric()
+                    ->default(0)
+                    ->prefix('৳'),
+                Toggle::make('is_active')
+                    ->required()
+                    ->default(true),
+            ]);
+    }
+}
