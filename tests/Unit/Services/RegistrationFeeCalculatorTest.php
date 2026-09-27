@@ -110,6 +110,7 @@ class RegistrationFeeCalculatorTest extends TestCase
         $this->assertSame(0.0, $breakdown['childFee']);
         $this->assertSame(2, $breakdown['adultCount']);
         $this->assertSame(0, $breakdown['childCount']);
+        $this->assertSame(['Adult' => 300.0], $breakdown['perHead']);
         $this->assertSame(1100.0, $breakdown['subtotal']);
         $this->assertSame('percentage', $breakdown['chargeType']);
         $this->assertSame('Service Charge', $breakdown['chargeLabel']);

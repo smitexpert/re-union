@@ -30,6 +30,7 @@ class RegistrationFeeCalculator
      *   childFee: float,
      *   adultCount: int,
      *   childCount: int,
+     *   perHead: array<string, float>,
      *   subtotal: float,
      *   chargeType: string|null,
      *   chargeLabel: string,
@@ -45,11 +46,7 @@ class RegistrationFeeCalculator
         $adultFee = (float) ($perHead['Adult'] ?? 0.0);
         $childFee = (float) ($perHead['Child'] ?? 0.0);
 
-        $guestTotal = ($adultFee * $adultCount) + ($childFee * $childCount);
-        $subtotal = $base + $guestTotal;
-
-        $chargeType = $reunion->charge_type;
-        $chargeValue = (float) ($reunion->charge_value ?? 0.0);
+        $subtotal = self::subtotal($reunion, $adultCount, $childCount);
         $chargeAmount = self::chargeAmount($reunion, $subtotal);
 
         return [
@@ -58,10 +55,11 @@ class RegistrationFeeCalculator
             'childFee' => $childFee,
             'adultCount' => $adultCount,
             'childCount' => $childCount,
+            'perHead' => $perHead,
             'subtotal' => round($subtotal, 2),
-            'chargeType' => $chargeType,
+            'chargeType' => $reunion->charge_type,
             'chargeLabel' => 'Service Charge',
-            'chargeValue' => $chargeValue,
+            'chargeValue' => (float) ($reunion->charge_value ?? 0.0),
             'chargeAmount' => round($chargeAmount, 2),
             'total' => round($subtotal + $chargeAmount, 2),
         ];
