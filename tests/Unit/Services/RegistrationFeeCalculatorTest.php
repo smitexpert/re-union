@@ -69,11 +69,11 @@ class RegistrationFeeCalculatorTest extends TestCase
             'is_active' => true,
         ]);
 
-        // subtotal = 500 + 2*300 + 1*150 = 1850.00
-        // charge  = 1850 * 0.05 = 92.50
-        // total   = 1942.50
+        // subtotal = 500 + 2*300 + 1*150 = 1250.00
+        // charge  = 1250 * 0.05 = 62.50
+        // total   = 1312.50
         $this->assertSame(
-            '1942.50',
+            '1312.50',
             RegistrationFeeCalculator::total($reunion, adultCount: 2, childCount: 1)
         );
     }

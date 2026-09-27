@@ -8,31 +8,63 @@ use App\Models\ReunionGuestFee;
 class RegistrationFeeCalculator
 {
     /**
-     * Compute the total registration fee (decimal string) for a reunion
-     * with the given adult and child guest counts.
+     * Compute the total registration fee (decimal string) for a reunion,
+     * including base fee, per-head guest fees, and the configured service
+     * charge (fixed BDT amount or percentage of the subtotal).
      */
     public static function total(Reunion $reunion, int $adultCount = 0, int $childCount = 0): string
     {
+        $subtotal = self::subtotal($reunion, $adultCount, $childCount);
+        $charge = self::chargeAmount($reunion, $subtotal);
+
+        return number_format($subtotal + $charge, 2, '.', '');
+    }
+
+    /**
+     * Full fee breakdown for the registration wizard. All floats, two decimals
+     * of precision by convention.
+     *
+     * @return array{
+     *   base: float,
+     *   adultFee: float,
+     *   childFee: float,
+     *   adultCount: int,
+     *   childCount: int,
+     *   subtotal: float,
+     *   chargeType: string|null,
+     *   chargeLabel: string,
+     *   chargeValue: float,
+     *   chargeAmount: float,
+     *   total: float,
+     * }
+     */
+    public static function breakdown(Reunion $reunion, int $adultCount = 0, int $childCount = 0): array
+    {
         $base = (float) $reunion->registration_fee;
+        $perHead = self::perHeadFees($reunion);
+        $adultFee = (float) ($perHead['Adult'] ?? 0.0);
+        $childFee = (float) ($perHead['Child'] ?? 0.0);
 
-        $activeFees = ReunionGuestFee::query()
-            ->where('reunion_id', $reunion->id)
-            ->where('is_active', true)
-            ->get()
-            ->keyBy('guest_type');
+        $guestTotal = ($adultFee * $adultCount) + ($childFee * $childCount);
+        $subtotal = $base + $guestTotal;
 
-        $adultFee = $activeFees->get('Adult');
-        $childFee = $activeFees->get('Child');
+        $chargeType = $reunion->charge_type;
+        $chargeValue = (float) ($reunion->charge_value ?? 0.0);
+        $chargeAmount = self::chargeAmount($reunion, $subtotal);
 
-        $guestTotal = 0.0;
-        if ($adultFee && $adultCount > 0) {
-            $guestTotal += (float) $adultFee->fee * $adultCount;
-        }
-        if ($childFee && $childCount > 0) {
-            $guestTotal += (float) $childFee->fee * $childCount;
-        }
-
-        return number_format($base + $guestTotal, 2, '.', '');
+        return [
+            'base' => $base,
+            'adultFee' => $adultFee,
+            'childFee' => $childFee,
+            'adultCount' => $adultCount,
+            'childCount' => $childCount,
+            'subtotal' => round($subtotal, 2),
+            'chargeType' => $chargeType,
+            'chargeLabel' => 'Service Charge',
+            'chargeValue' => $chargeValue,
+            'chargeAmount' => round($chargeAmount, 2),
+            'total' => round($subtotal + $chargeAmount, 2),
+        ];
     }
 
     /**
@@ -50,5 +82,33 @@ class RegistrationFeeCalculator
                 $fee->guest_type => (float) $fee->fee,
             ])
             ->all();
+    }
+
+    private static function subtotal(Reunion $reunion, int $adultCount, int $childCount): float
+    {
+        $base = (float) $reunion->registration_fee;
+        $perHead = self::perHeadFees($reunion);
+
+        $adultFee = (float) ($perHead['Adult'] ?? 0.0);
+        $childFee = (float) ($perHead['Child'] ?? 0.0);
+
+        return $base
+            + ($adultFee * $adultCount)
+            + ($childFee * $childCount);
+    }
+
+    private static function chargeAmount(Reunion $reunion, float $subtotal): float
+    {
+        if (! $reunion->isChargeEnabled()) {
+            return 0.0;
+        }
+
+        $value = (float) $reunion->charge_value;
+
+        return match ($reunion->charge_type) {
+            'fixed' => $value,
+            'percentage' => $subtotal * ($value / 100),
+            default => 0.0,
+        };
     }
 }
