@@ -49,7 +49,7 @@ class ViewRegistration extends EditRecord
                 ->visible(fn () => $this->getRecord()->payment_status === 'paid')
                 ->requiresConfirmation()
                 ->modalHeading('Resend confirmation SMS?')
-                ->modalDescription(fn () => 'Send the registration-confirmed SMS again to ' . ($this->getRecord()->student?->phone ?? '(no phone on file)') . '.')
+                ->modalDescription(fn () => 'Send the registration-confirmed SMS again to '.($this->getRecord()->student?->phone ?? '(no phone on file)').'.')
                 ->action(function () {
                     /** @var ReunionRegistration $record */
                     $record = $this->getRecord();

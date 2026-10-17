@@ -21,11 +21,11 @@ class BangladeshPhone
         }
 
         if (str_starts_with($digits, '0') && strlen($digits) === 11) {
-            return '880' . substr($digits, 1);
+            return '880'.substr($digits, 1);
         }
 
         if (strlen($digits) === 10 && str_starts_with($digits, '1')) {
-            return '880' . $digits;
+            return '880'.$digits;
         }
 
         return null;
