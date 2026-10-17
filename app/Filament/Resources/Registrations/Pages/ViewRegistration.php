@@ -4,11 +4,14 @@ namespace App\Filament\Resources\Registrations\Pages;
 
 use App\Filament\Resources\Registrations\RegistrationResource;
 use App\Filament\Resources\Reunions\ReunionResource;
+use App\Models\ReunionRegistration;
+use App\Services\Sms\SendRegistrationSms;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -17,6 +20,14 @@ use Filament\Support\Icons\Heroicon;
 class ViewRegistration extends EditRecord
 {
     protected static string $resource = RegistrationResource::class;
+
+    /**
+     * Snapshot of the registration's payment_status captured before save
+     * runs, so afterSave() can detect transitions. Captured in
+     * mutateFormDataBeforeSave() because Eloquent syncs the model's
+     * `original` array once $record->update() has been called.
+     */
+    private ?string $previousPaymentStatus = null;
 
     protected function getRedirectUrl(): string
     {
@@ -31,7 +42,54 @@ class ViewRegistration extends EditRecord
                 ->icon(Heroicon::ArrowLeft)
                 ->color('gray')
                 ->url(fn (): string => ReunionResource::getUrl('view', ['record' => $this->getRecord()->reunion])),
+            Action::make('resendSms')
+                ->label('Resend Confirmation SMS')
+                ->icon(Heroicon::PaperAirplane)
+                ->color('gray')
+                ->visible(fn () => $this->getRecord()->payment_status === 'paid')
+                ->requiresConfirmation()
+                ->modalHeading('Resend confirmation SMS?')
+                ->modalDescription(fn () => 'Send the registration-confirmed SMS again to ' . ($this->getRecord()->student?->phone ?? '(no phone on file)') . '.')
+                ->action(function () {
+                    /** @var ReunionRegistration $record */
+                    $record = $this->getRecord();
+                    $log = app(SendRegistrationSms::class)->send(
+                        $record->loadMissing(['reunion', 'student', 'guests']),
+                        'manual_resend'
+                    );
+
+                    Notification::make()
+                        ->title($log->status === 'sent' ? "SMS sent to {$log->phone}" : 'SMS send failed')
+                        ->body($log->status === 'sent' ? null : $log->error_message)
+                        ->status($log->status === 'sent' ? 'success' : 'warning')
+                        ->send();
+                }),
         ];
+    }
+
+    protected function afterSave(): void
+    {
+        /** @var ReunionRegistration $record */
+        $record = $this->getRecord()->loadMissing(['reunion', 'student', 'guests']);
+
+        $new = $record->payment_status;
+        $old = $this->previousPaymentStatus;
+
+        if ($new === $old) {
+            return;
+        }
+
+        $trigger = match (true) {
+            $new === 'paid' => 'payment_paid',
+            $new === 'refunded' => 'payment_refunded',
+            default => null,
+        };
+
+        if ($trigger === null) {
+            return;
+        }
+
+        app(SendRegistrationSms::class)->send($record, $trigger);
     }
 
     public function form(Schema $schema): Schema
@@ -143,6 +201,10 @@ class ViewRegistration extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
+        // Snapshot the prior payment_status before Eloquent syncs `original`
+        // on update, so afterSave() can detect a transition.
+        $this->previousPaymentStatus = $this->getRecord()->payment_status;
+
         $paymentStatus = $data['payment_status'] ?? $this->getRecord()->payment_status;
 
         // Auto-derive registration_status from payment_status:
