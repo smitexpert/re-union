@@ -3,6 +3,7 @@
 namespace App\Services\Sms;
 
 use App\Models\ReunionGuest;
+use App\Models\ReunionGuestFee;
 use App\Models\ReunionRegistration;
 use App\Models\SmsLog;
 use App\Support\BangladeshPhone;
@@ -106,15 +107,24 @@ class SendRegistrationSms
      */
     private function guestBreakdown(ReunionRegistration $registration): array
     {
+        $reunionId = $registration->reunion_id;
+        $activeTypes = ReunionGuestFee::query()
+            ->where('reunion_id', $reunionId)
+            ->where('is_active', true)
+            ->pluck('guest_type')
+            ->all();
+
         if ($registration->relationLoaded('guests')) {
             $guests = $registration->guests;
         } else {
             $guests = ReunionGuest::where('registration_id', $registration->id)->get();
         }
 
-        $adult = $guests->where('guest_type', 'Adult')->count();
-        $child = $guests->where('guest_type', 'Child')->count();
+        $active = $guests->whereIn('guest_type', $activeTypes);
 
-        return [$adult, $child];
+        return [
+            $active->where('guest_type', 'Adult')->count(),
+            $active->where('guest_type', 'Child')->count(),
+        ];
     }
 }
