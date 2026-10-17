@@ -119,6 +119,26 @@ class SendRegistrationSmsTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_writes_failed_log_when_provider_returns_2xx_with_business_failure_response_code(): void
+    {
+        $body = json_encode([
+            'response_code' => 1006,
+            'success_message' => '',
+            'error_message' => 'Unsuccessfull!! Balance Validity Not Available in this naharsharmin Account',
+        ]);
+
+        Http::fake(['bulksmsbd.net/*' => Http::response($body, 200)]);
+
+        $registration = $this->makeRegistrationWithGuests('unpaid');
+        $log = app(SendRegistrationSms::class)->send($registration, 'payment_paid');
+
+        $this->assertSame('failed', $log->status);
+        $this->assertSame(1006, $log->provider_code);
+        $this->assertSame(200, $log->http_status);
+        $this->assertStringContainsString('Balance Validity Not Available', (string) $log->error_message);
+        $this->assertNotNull($log->sent_at);
+    }
+
     public function test_writes_failed_log_when_provider_returns_5xx_but_sms_log_still_created(): void
     {
         Http::fake(['bulksmsbd.net/*' => Http::response('Server Error', 500)]);

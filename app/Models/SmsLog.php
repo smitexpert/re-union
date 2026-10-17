@@ -18,6 +18,7 @@ class SmsLog extends Model
         'trigger',
         'status',
         'http_status',
+        'provider_code',
         'provider_response',
         'error_message',
         'sent_at',
@@ -28,6 +29,7 @@ class SmsLog extends Model
         return [
             'sent_at' => 'datetime',
             'http_status' => 'integer',
+            'provider_code' => 'integer',
         ];
     }
 

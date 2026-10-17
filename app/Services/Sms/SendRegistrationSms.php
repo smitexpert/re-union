@@ -47,6 +47,7 @@ class SendRegistrationSms
             return $this->writeLog($base + [
                 'status' => 'sent',
                 'http_status' => $result['http_status'],
+                'provider_code' => $result['provider_code'],
                 'provider_response' => $this->truncate((string) ($result['body'] ?? '')),
                 'sent_at' => now(),
             ]);
@@ -55,8 +56,11 @@ class SendRegistrationSms
         return $this->writeLog($base + [
             'status' => 'failed',
             'http_status' => $result['http_status'],
+            'provider_code' => $result['provider_code'],
             'provider_response' => $this->truncate((string) ($result['body'] ?? '')),
-            'error_message' => $result['exception'] ?? 'provider returned non-2xx',
+            'error_message' => $result['provider_error']
+                ?? $result['exception']
+                ?? 'provider returned non-2xx',
             'sent_at' => now(),
         ]);
     }
