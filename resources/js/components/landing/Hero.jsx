@@ -38,11 +38,11 @@ export default function Hero({ registerUrl, paymentLookupUrl }) {
 
                 <p className="mt-8 inline-flex items-center gap-2 rounded-full border border-brand/30 bg-white/70 px-4 py-1.5 text-[11px] font-bold tracking-[0.2em] text-brand-ink uppercase">
                     <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-brand" />
-                    Social Work Alumni Association
+                    SOCIAL WORK ALUMNI ASSOCIATION OF TEJGAON COLLEGE
                 </p>
 
                 <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight text-balance sm:text-5xl">
-                    Reconnect, Reflect, Rejoice:{' '}
+                    Reconnect | Reflect | Rejoice:{' '}
                     <span className="text-brand-ink">SWAATC Reunion</span>
                 </h1>
 

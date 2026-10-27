@@ -38,7 +38,7 @@ export default function Step2Reunion({ reunion, feeBreakdown }) {
                 ) : null}
                 {perHead.Child ? (
                     <div className="flex justify-between">
-                        <dt className="font-semibold text-gray-700">Child guest (per head)</dt>
+                        <dt className="font-semibold text-gray-700">Child guest (per head) (Below 5 years)</dt>
                         <dd className="text-gray-900">{formatBDT(perHead.Child)}</dd>
                     </div>
                 ) : null}
