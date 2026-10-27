@@ -213,7 +213,7 @@
                 <th>Name</th>
                 <th>Phone</th>
                 <th>Grad. Year</th>
-                <th>Department</th>
+                <th>Option</th>
                 <th>Session</th>
                 <th>Occupation</th>
                 <th>Addresses</th>
@@ -254,7 +254,7 @@
                     <td>{{ $registration->student?->full_name ?: '—' }}</td>
                     <td>{{ $registration->student?->phone ?: '—' }}</td>
                     <td>{{ $registration->student?->graduation_year ?: '—' }}</td>
-                    <td>{{ $registration->student?->department ?: '—' }}</td>
+                    <td>{{ $registration->student?->option ?: '—' }}</td>
                     <td>{{ $registration->student?->session ?: '—' }}</td>
                     <td>{{ $registration->student?->current_occupation ?: '—' }}</td>
                     <td>

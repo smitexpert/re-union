@@ -59,4 +59,18 @@ class RegistrationShowTest extends TestCase
             ->where('feeBreakdown.total', 500)
         );
     }
+
+    public function test_show_passes_the_student_options_to_inertia(): void
+    {
+        Reunion::factory()->create([
+            'registration_fee' => 500.00,
+        ]);
+
+        $response = $this->get('/register');
+
+        $response->assertInertia(fn (AssertableInertia $page) => $page
+            ->component('Register')
+            ->where('options', ['Honors', 'Masters'])
+        );
+    }
 }

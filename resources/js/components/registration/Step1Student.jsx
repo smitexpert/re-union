@@ -1,10 +1,11 @@
 import ImageInput from '@/components/registration/fields/ImageInput';
+import SelectInput from '@/components/registration/fields/SelectInput';
 import TextInput from '@/components/registration/fields/TextInput';
 import TextAreaInput from '@/components/registration/fields/TextAreaInput';
 
 const TSHIRT_SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
-export default function Step1Student({ data, setData, errors }) {
+export default function Step1Student({ data, setData, errors, options }) {
     const updateStudent = (field) => (e) => setData(`student.${field}`, e.target.value);
     const updateTop = (field) => (e) => setData(field, e.target.value);
 
@@ -55,12 +56,14 @@ export default function Step1Student({ data, setData, errors }) {
                     error={errors['student.graduation_year']}
                     required
                 />
-                <TextInput
-                    id="student.department"
-                    label="Department"
-                    value={data.student.department}
-                    onChange={updateStudent('department')}
-                    error={errors['student.department']}
+                <SelectInput
+                    id="student.option"
+                    label="Option"
+                    options={options}
+                    placeholder="Select option…"
+                    value={data.student.option}
+                    onChange={updateStudent('option')}
+                    error={errors['student.option']}
                     required
                 />
             </div>
@@ -104,33 +107,16 @@ export default function Step1Student({ data, setData, errors }) {
                 error={errors['student.office_address']}
             />
 
-            <div>
-                <label htmlFor="tshirt_size" className="mb-1 block text-sm font-semibold text-gray-700">
-                    T-shirt size <span aria-hidden="true" className="ml-0.5 text-red-600">*</span>
-                </label>
-                <select
-                    id="tshirt_size"
-                    name="tshirt_size"
-                    value={data.tshirt_size}
-                    onChange={updateTop('tshirt_size')}
-                    aria-invalid={errors.tshirt_size ? 'true' : 'false'}
-                    aria-describedby={errors.tshirt_size ? 'tshirt_size-error' : undefined}
-                    aria-required="true"
-                    className={`block w-full min-h-12 rounded-xl border px-3 py-2.5 text-base text-gray-900 focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/30 focus:outline-none ${
-                        errors.tshirt_size ? 'border-red-400' : 'border-gray-200'
-                    }`}
-                >
-                    <option value="">Select size…</option>
-                    {TSHIRT_SIZES.map((size) => (
-                        <option key={size} value={size}>{size}</option>
-                    ))}
-                </select>
-                {errors.tshirt_size ? (
-                    <p id="tshirt_size-error" className="mt-1 text-sm text-red-600">
-                        {errors.tshirt_size}
-                    </p>
-                ) : null}
-            </div>
+            <SelectInput
+                id="tshirt_size"
+                label="T-shirt size"
+                options={TSHIRT_SIZES}
+                placeholder="Select size…"
+                value={data.tshirt_size}
+                onChange={updateTop('tshirt_size')}
+                error={errors.tshirt_size}
+                required
+            />
         </div>
     );
 }

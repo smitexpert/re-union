@@ -112,9 +112,10 @@ class ViewRegistration extends EditRecord
                         TextEntry::make('student.graduation_year')
                             ->label('Graduation Year')
                             ->badge(),
-                        TextEntry::make('student.department')
-                            ->label('Department')
-                            ->badge(),
+                        TextEntry::make('student.option')
+                            ->label('Option')
+                            ->badge()
+                            ->placeholder('—'),
                         TextEntry::make('student.session')
                             ->label('Session')
                             ->placeholder('—'),

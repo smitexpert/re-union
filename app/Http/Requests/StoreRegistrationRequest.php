@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Student;
+use App\Enums\StudentOption;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -19,7 +19,7 @@ class StoreRegistrationRequest extends FormRequest
             'student.full_name' => ['required', 'string', 'max:150'],
             'student.phone' => ['required', 'string', 'max:20'],
             'student.graduation_year' => ['required', 'integer', 'between:1950,2100'],
-            'student.department' => ['required', 'string', 'max:100'],
+            'student.option' => ['required', Rule::enum(StudentOption::class)],
             'student.session' => ['required', 'string', 'max:255'],
             'student.current_occupation' => ['required', 'string', 'max:150'],
             'student.present_address' => ['required', 'string'],

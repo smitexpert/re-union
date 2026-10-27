@@ -63,8 +63,8 @@ export default function Step4Review({ data, setData, errors, reunion, feeBreakdo
                     <dd className="text-right text-gray-900">{data.student.graduation_year}</dd>
                 </div>
                 <div className="flex justify-between gap-3">
-                    <dt className="font-semibold text-gray-700">Department</dt>
-                    <dd className="text-right text-gray-900">{data.student.department}</dd>
+                    <dt className="font-semibold text-gray-700">Option</dt>
+                    <dd className="text-right text-gray-900">{data.student.option}</dd>
                 </div>
                 {data.student.session ? (
                     <div className="flex justify-between gap-3">

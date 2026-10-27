@@ -27,7 +27,8 @@ class StudentsTable
                 TextColumn::make('graduation_year')
                     ->sortable()
                     ->badge(),
-                TextColumn::make('department')
+                TextColumn::make('option')
+                    ->label('Option')
                     ->searchable()
                     ->badge(),
                 TextColumn::make('session')

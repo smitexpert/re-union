@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Students\Schemas;
 
+use App\Enums\StudentOption;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -25,9 +27,10 @@ class StudentForm
                     ->minValue(1950)
                     ->maxValue(2100)
                     ->required(),
-                TextInput::make('department')
-                    ->required()
-                    ->maxLength(100),
+                Select::make('option')
+                    ->label('Option')
+                    ->options(StudentOption::options())
+                    ->required(),
                 TextInput::make('session')
                     ->maxLength(255),
                 TextInput::make('current_occupation')

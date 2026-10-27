@@ -11,7 +11,7 @@ const INITIAL_DATA = {
         full_name: '',
         phone: '',
         graduation_year: '',
-        department: '',
+        option: '',
         session: '',
         current_occupation: '',
         present_address: '',
@@ -35,7 +35,7 @@ function isStep1Valid(data) {
         s.full_name.trim() !== '' &&
         s.phone.trim() !== '' &&
         String(s.graduation_year).trim() !== '' &&
-        s.department.trim() !== '' &&
+        s.option.trim() !== '' &&
         s.session.trim() !== '' &&
         s.current_occupation.trim() !== '' &&
         s.present_address.trim() !== '' &&
@@ -63,7 +63,7 @@ function buildFormData(data) {
     return fd;
 }
 
-export default function Wizard({ reunion, feeBreakdown }) {
+export default function Wizard({ reunion, feeBreakdown, options }) {
     const [step, setStep] = useState(0);
     const [data, setData] = useState(INITIAL_DATA);
     const [errors, setErrors] = useState({});
@@ -152,7 +152,7 @@ export default function Wizard({ reunion, feeBreakdown }) {
 
             <form onSubmit={onSubmit}>
                 {step === 0 ? (
-                    <Step1Student data={data} setData={setField} errors={errors} />
+                    <Step1Student data={data} setData={setField} errors={errors} options={options} />
                 ) : null}
                 {step === 1 ? (
                     <Step2Reunion reunion={reunion} feeBreakdown={feeBreakdown} />

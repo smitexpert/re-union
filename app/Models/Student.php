@@ -14,7 +14,7 @@ class Student extends Model
         'full_name',
         'phone',
         'graduation_year',
-        'department',
+        'option',
         'session',
         'current_occupation',
         'present_address',

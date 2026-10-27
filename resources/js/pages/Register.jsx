@@ -3,7 +3,7 @@ import ClosedNotice from '@/components/registration/ClosedNotice';
 import Wizard from '@/components/registration/Wizard';
 import PageLogoHeader from '@/components/PageLogoHeader';
 
-export default function Register({ mode, reunion, feeBreakdown, banglaMessage, paymentLookupUrl }) {
+export default function Register({ mode, reunion, feeBreakdown, options, banglaMessage, paymentLookupUrl }) {
     return (
         <>
             <Head title="Register — SWAATC Reunion" />
@@ -13,7 +13,7 @@ export default function Register({ mode, reunion, feeBreakdown, banglaMessage, p
                     {mode === 'closed' ? (
                         <ClosedNotice banglaMessage={banglaMessage} paymentLookupUrl={paymentLookupUrl} />
                     ) : (
-                        <Wizard reunion={reunion} feeBreakdown={feeBreakdown} />
+                        <Wizard reunion={reunion} feeBreakdown={feeBreakdown} options={options} />
                     )}
                 </div>
             </main>

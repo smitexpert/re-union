@@ -21,7 +21,7 @@ class StudentFactory extends Factory
             'full_name' => fake()->name(),
             'phone' => '01712345678',
             'graduation_year' => '2015',
-            'department' => 'CSE',
+            'option' => 'Honors',
             'session' => '2011-12',
             'current_occupation' => null,
             'present_address' => null,

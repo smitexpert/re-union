@@ -7,6 +7,7 @@ use App\Models\Student;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 /**
@@ -40,7 +41,7 @@ class RegistrationStoreTest extends TestCase
                 'full_name' => 'Md Shanewyz Molla',
                 'phone' => '03994387497',
                 'graduation_year' => 2020,
-                'department' => 'CSE',
+                'option' => 'Honors',
                 'session' => '2016-17',
                 'current_occupation' => 'Software Engineer',
                 'present_address' => 'House 4, Road 7, Block C, Dhaka Uddan, Mohammadpur',
@@ -84,6 +85,7 @@ class RegistrationStoreTest extends TestCase
         $student = Student::where('phone', '03994387497')->first();
         $this->assertNotNull($student, 'Student row should have been persisted.');
         $this->assertSame('Md Shanewyz Molla', $student->full_name);
+        $this->assertSame('Honors', $student->option);
 
         $this->assertNotEmpty(
             $student->photo,
@@ -140,6 +142,7 @@ class RegistrationStoreTest extends TestCase
 
         $payload = $this->basePayload();
         $payload['student'] = array_merge($payload['student'], [
+            'option' => null,
             'session' => null,
             'current_occupation' => null,
             'present_address' => null,
@@ -152,6 +155,7 @@ class RegistrationStoreTest extends TestCase
         // permanent_address and office_address are now optional — only the
         // other student fields are expected to fail validation here.
         $response->assertSessionHasErrors([
+            'student.option',
             'student.session',
             'student.current_occupation',
             'student.present_address',
@@ -160,5 +164,60 @@ class RegistrationStoreTest extends TestCase
             'student.permanent_address',
             'student.office_address',
         ]);
+    }
+
+    /**
+     * @return array<string, array{string}>
+     */
+    public static function supportedOptions(): array
+    {
+        return [
+            'honors' => ['Honors'],
+            'masters' => ['Masters'],
+        ];
+    }
+
+    #[DataProvider('supportedOptions')]
+    public function test_registration_persists_the_selected_option(string $option): void
+    {
+        Storage::fake('public');
+
+        $reunion = Reunion::create([
+            'title' => 'Test Reunion',
+            'event_date' => now()->addDays(30)->toDateString(),
+            'registration_deadline' => now()->addDays(7)->toDateString(),
+            'is_active' => true,
+            'registration_fee' => 500,
+        ]);
+
+        $payload = $this->basePayload();
+        $payload['student']['option'] = $option;
+        $payload['student']['photo'] = UploadedFile::fake()->image('headshot.jpg', 600, 600)->size(500);
+
+        $response = $this->post('/register', $payload);
+
+        $response->assertSessionHasNoErrors();
+
+        $student = Student::where('phone', '03994387497')->first();
+        $this->assertNotNull($student, 'Student row should have been persisted.');
+        $this->assertSame($option, $student->option);
+    }
+
+    public function test_registration_rejects_an_unsupported_option(): void
+    {
+        $reunion = Reunion::create([
+            'title' => 'Test Reunion',
+            'event_date' => now()->addDays(30)->toDateString(),
+            'registration_deadline' => now()->addDays(7)->toDateString(),
+            'is_active' => true,
+            'registration_fee' => 500,
+        ]);
+
+        $payload = $this->basePayload();
+        $payload['student']['option'] = 'PhD';
+
+        $response = $this->post('/register', $payload);
+
+        $response->assertSessionHasErrors(['student.option']);
     }
 }

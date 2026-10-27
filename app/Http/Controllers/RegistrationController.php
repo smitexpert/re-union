@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\StudentOption;
 use App\Http\Requests\StoreRegistrationRequest;
 use App\Models\Reunion;
 use App\Models\ReunionRegistration;
@@ -38,6 +39,7 @@ class RegistrationController extends Controller
                 'registration_fee' => (float) $reunion->registration_fee,
             ],
             'feeBreakdown' => RegistrationFeeCalculator::breakdown($reunion),
+            'options' => StudentOption::values(),
             'paymentLookupUrl' => '/payments',
         ]);
     }
@@ -102,7 +104,7 @@ class RegistrationController extends Controller
                 if ($photoFile) {
                     $previousPhoto = $student->photo;
                     // $path = $photoFile->store('students', 'public');
-                    $path = time() . '_' . $photoFile->getClientOriginalName();
+                    $path = time().'_'.$photoFile->getClientOriginalName();
                     logger("Storing photo for student {$student->id} to {$path}");
                     $photoFile->move(public_path('uploads'), $path);
                     $student->photo = $path;
