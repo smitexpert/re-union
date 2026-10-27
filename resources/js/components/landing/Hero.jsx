@@ -1,10 +1,20 @@
 import { Link } from '@inertiajs/react';
+import { useState } from 'react';
 import Reveal from '@/components/landing/Reveal';
 
 const focusRing =
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-ink focus-visible:ring-offset-2';
 
-export default function Hero({ registerUrl }) {
+export default function Hero({ registerUrl, paymentLookupUrl }) {
+    const [identifier, setIdentifier] = useState('');
+    const handleLookup = (e) => {
+        e.preventDefault();
+        const value = String(identifier || '').trim();
+        if (!value) return;
+        const normalized = value.replace(/\s+/g, '').toUpperCase();
+        window.location.href = `${paymentLookupUrl}/${encodeURIComponent(normalized)}`;
+    };
+
     return (
         <section id="top" className="relative overflow-hidden px-6 pt-14 pb-20 text-center sm:pt-20 sm:pb-24">
             {/* Decorative brand wash */}
@@ -63,6 +73,36 @@ export default function Hero({ registerUrl }) {
                         </svg>
                     </Link>
                 </div>
+
+                <form
+                    onSubmit={handleLookup}
+                    aria-label="Find my registration"
+                    className="mx-auto mt-8 w-full max-w-sm rounded-2xl border border-gray-200 bg-white/85 p-3 shadow-sm backdrop-blur"
+                >
+                    <label htmlFor="hero-lookup" className="block text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
+                        Already registered? Check status
+                    </label>
+                    <div className="mt-2 flex gap-2">
+                        <input
+                            id="hero-lookup"
+                            type="text"
+                            inputMode="text"
+                            autoComplete="off"
+                            required
+                            value={identifier}
+                            onChange={(e) => setIdentifier(e.target.value)}
+                            placeholder="SWA-AB12CD34"
+                            className={`block w-full min-h-11 rounded-xl border border-gray-200 px-3 py-2 text-base text-gray-900 focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/30 focus:outline-none ${focusRing}`}
+                        />
+                        <button
+                            type="submit"
+                            disabled={!identifier.trim()}
+                            className={`inline-flex items-center justify-center gap-1.5 rounded-xl bg-gray-900 px-4 text-sm font-bold text-white transition duration-200 hover:bg-black disabled:cursor-not-allowed disabled:opacity-40 ${focusRing}`}
+                        >
+                            View status
+                        </button>
+                    </div>
+                </form>
             </Reveal>
         </section>
     );

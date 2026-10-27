@@ -3,11 +3,13 @@
 namespace App\Filament\Resources\Reunions\Pages;
 
 use App\Filament\Resources\Reunions\ReunionResource;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class ViewReunion extends ViewRecord
 {
@@ -32,6 +34,19 @@ class ViewReunion extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('printConfirmedRegistrations')
+                ->label('Confirmed List')
+                ->icon(Heroicon::ArrowDownTray)
+                ->color('success')
+                ->visible(fn () => $this->getRecord()->registrations()
+                    ->where('registration_status', 'confirmed')
+                    ->exists())
+                ->url(fn (): string => route(
+                    'filament.admin.reunions.confirmed-registrations.print',
+                    ['reunion' => $this->getRecord()]
+                ))
+                ->openUrlInNewTab(),
+
             EditAction::make(),
         ];
     }

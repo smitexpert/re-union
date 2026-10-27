@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class ReunionRegistration extends Model
@@ -71,6 +72,51 @@ class ReunionRegistration extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(Payment::class, 'registration_id');
+    }
+
+    /**
+     * Sum of completed payments — used by the confirmed-registrations export.
+     *
+     * Reads from the eager-loaded `payments` relation when present so the export
+     * can run in a single query; falls back to a DB query otherwise.
+     */
+    public function getTotalPaidAmountAttribute(): ?string
+    {
+        $payments = $this->relationLoaded('payments') ? $this->payments : $this->payments()->get();
+        $total = $payments->whereIn('status', ['completed', 'paid'])->sum('amount');
+
+        return $total === null ? null : (string) $total;
+    }
+
+    public function getLatestTransactionIdAttribute(): ?string
+    {
+        if ($this->relationLoaded('payments')) {
+            return $this->payments->sortByDesc('id')->first()?->transaction_id;
+        }
+
+        return $this->payments()->latest('id')->value('transaction_id');
+    }
+
+    public function getLatestPaymentMethodAttribute(): ?string
+    {
+        if ($this->relationLoaded('payments')) {
+            return $this->payments->sortByDesc('id')->first()?->payment_method;
+        }
+
+        return $this->payments()->latest('id')->value('payment_method');
+    }
+
+    public function getLatestPaidAtAttribute(): ?string
+    {
+        $paidAt = null;
+        if ($this->relationLoaded('payments')) {
+            $latest = $this->payments->sortByDesc('id')->first();
+            $paidAt = $latest?->paid_at;
+        } else {
+            $paidAt = $this->payments()->latest('id')->value('paid_at');
+        }
+
+        return $paidAt ? Carbon::parse($paidAt)->format('d M Y H:i') : null;
     }
 
     /**

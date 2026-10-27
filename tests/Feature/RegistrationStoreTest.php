@@ -149,10 +149,14 @@ class RegistrationStoreTest extends TestCase
 
         $response = $this->post('/register', $payload);
 
+        // permanent_address and office_address are now optional — only the
+        // other student fields are expected to fail validation here.
         $response->assertSessionHasErrors([
             'student.session',
             'student.current_occupation',
             'student.present_address',
+        ]);
+        $response->assertSessionDoesntHaveErrors([
             'student.permanent_address',
             'student.office_address',
         ]);

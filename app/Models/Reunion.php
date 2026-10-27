@@ -50,7 +50,7 @@ class Reunion extends Model
     {
         $today = now()->toDateString();
 
-        return static::query()
+        $check = static::query()
             ->where('is_active', true)
             ->whereDate('event_date', '>=', $today)
             ->where(function ($query) use ($today) {
@@ -59,6 +59,8 @@ class Reunion extends Model
             })
             ->orderBy('event_date')
             ->first();
+
+        return $check;
     }
 
     public function isChargeEnabled(): bool

@@ -39,8 +39,6 @@ function isStep1Valid(data) {
         s.session.trim() !== '' &&
         s.current_occupation.trim() !== '' &&
         s.present_address.trim() !== '' &&
-        s.permanent_address.trim() !== '' &&
-        s.office_address.trim() !== '' &&
         String(data.tshirt_size).trim() !== ''
     );
 }

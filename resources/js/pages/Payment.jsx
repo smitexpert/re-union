@@ -543,22 +543,70 @@ function roundRect(ctx, x, y, w, h, r) {
     ctx.closePath();
 }
 
-const BKASH_NUMBER = '01994387497';
+const PAYMENT_NUMBER = '01735997767';
 
-function GuideHeader({ method, badge }) {
-    return (
-        <div className="flex items-start justify-between gap-3">
-            <h3 className="text-base font-bold text-pink-900">{method}</h3>
-            <span className="inline-flex items-center rounded-full bg-pink-600 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-white">
-                {badge}
-            </span>
-        </div>
-    );
-}
+const PAYMENT_METHODS = {
+    bkash: {
+        key: 'bkash',
+        label: 'bKash',
+        title: 'কীভাবে বিকাশে টাকা পাঠাবেন',
+        ussdCode: '*247#',
+        ussdHeading: 'পদ্ধতি ১: *247# ডায়াল করে পাঠান',
+        appHeading: 'পদ্ধতি ২: বিকাশ অ্যাপ থেকে পাঠান',
+        recipientLabel: 'প্রাপকের বিকাশ পার্সোনাল নম্বর:',
+        recipientShort: 'বিকাশ পার্সোনাল নম্বর',
+        pinLabel: 'আপনার বিকাশ পিন নম্বর দিয়ে কনফার্ম করুন।',
+        ussdStepsPrefix: 'আপনার মোবাইল ফোনের ডায়ালার থেকে',
+        appIntro: 'আপনার মোবাইলে bKash অ্যাপটি ওপেন করুন (লগইন পিন দিয়ে)।',
+        appNumberSuffix: '(বিকাশ পার্সোনাল নম্বর)।',
+        pin: 'আপনার বিকাশ পিন',
+        primaryClass: 'bg-pink-700',
+        panelClass: 'rounded-2xl border-2 border-pink-300 bg-pink-50 p-5 shadow-md sm:p-6',
+        titleClass: 'text-lg font-extrabold text-pink-900',
+        panelTitleId: 'bkash-guide-heading',
+        amountCardClass: 'rounded-xl border border-pink-300 bg-white/80 p-4',
+        amountLabelClass: 'text-sm font-semibold text-pink-900',
+        amountValueClass: 'font-mono text-3xl font-extrabold tracking-wide text-pink-700',
+        recipientLabelClass: 'text-sm font-semibold text-pink-900',
+        numberClass: 'font-mono text-2xl font-extrabold tracking-widest text-pink-700 select-all',
+        hintClass: 'mt-1 text-xs text-pink-800',
+        stepBoxClass: 'mt-4 rounded-xl border border-pink-200 bg-white/70 p-4',
+        stepsClass: 'mt-3 list-decimal space-y-2 pl-5 text-sm text-pink-950 marker:font-bold marker:text-pink-700',
+        warnClass: 'mt-5 rounded-xl bg-pink-700 px-4 py-3 text-sm font-semibold text-white shadow-sm',
+    },
+    nagad: {
+        key: 'nagad',
+        label: 'Nagad',
+        title: 'কীভাবে নগদে টাকা পাঠাবেন',
+        ussdCode: '*167#',
+        ussdHeading: 'পদ্ধতি ১: *167# ডায়াল করে পাঠান',
+        appHeading: 'পদ্ধতি ২: নগদ অ্যাপ থেকে পাঠান',
+        recipientLabel: 'প্রাপকের নগদ পার্সোনাল নম্বর:',
+        recipientShort: 'নগদ পার্সোনাল নম্বর',
+        pinLabel: 'আপনার নগদ পিন নম্বর দিয়ে কনফার্ম করুন।',
+        ussdStepsPrefix: 'আপনার মোবাইল ফোনের ডায়ালার থেকে',
+        appIntro: 'আপনার মোবাইলে Nagad অ্যাপটি ওপেন করুন (লগইন পিন দিয়ে)।',
+        appNumberSuffix: '(নগদ পার্সোনাল নম্বর)।',
+        pin: 'আপনার নগদ পিন',
+        primaryClass: 'bg-orange-600',
+        panelClass: 'rounded-2xl border-2 border-orange-300 bg-orange-50 p-5 shadow-md sm:p-6',
+        titleClass: 'text-lg font-extrabold text-orange-900',
+        panelTitleId: 'nagad-guide-heading',
+        amountCardClass: 'rounded-xl border border-orange-300 bg-white/80 p-4',
+        amountLabelClass: 'text-sm font-semibold text-orange-900',
+        amountValueClass: 'font-mono text-3xl font-extrabold tracking-wide text-orange-700',
+        recipientLabelClass: 'text-sm font-semibold text-orange-900',
+        numberClass: 'font-mono text-2xl font-extrabold tracking-widest text-orange-700 select-all',
+        hintClass: 'mt-1 text-xs text-orange-800',
+        stepBoxClass: 'mt-4 rounded-xl border border-orange-200 bg-white/70 p-4',
+        stepsClass: 'mt-3 list-decimal space-y-2 pl-5 text-sm text-orange-950 marker:font-bold marker:text-orange-700',
+        warnClass: 'mt-5 rounded-xl bg-orange-600 px-4 py-3 text-sm font-semibold text-white shadow-sm',
+    },
+};
 
-function GuideSteps({ steps }) {
+function GuideSteps({ steps, className }) {
     return (
-        <ol className="mt-3 list-decimal space-y-2 pl-5 text-sm text-pink-950 marker:font-bold marker:text-pink-700">
+        <ol className={className}>
             {steps.map((step) => (
                 <li key={step}>{step}</li>
             ))}
@@ -566,79 +614,157 @@ function GuideSteps({ steps }) {
     );
 }
 
-function BkashGuide({ total }) {
+/**
+ * Tabbed "how to pay" panel. Two tabs (bKash / Nagad) controlled by
+ * `activeKey`; clicking a tab swaps the body in place rather than rendering
+ * both stacks back-to-back.
+ */
+function PaymentTabs({ total, activeKey, onChange }) {
     const totalText = formatBDT(total);
+    const order = ['bkash', 'nagad'];
+
+    return (
+        <section
+            aria-labelledby="payment-tabs-heading"
+            className="rounded-2xl border border-gray-200 bg-white shadow-sm"
+        >
+            <div className="flex items-center justify-between gap-3 border-b border-gray-100 px-5 py-3 sm:px-6">
+                <h2 id="payment-tabs-heading" className="text-base font-bold text-gray-900">
+                    কীভাবে পেমেন্ট করবেন
+                </h2>
+                <span className="text-xs text-gray-500">USSD বা অ্যাপ</span>
+            </div>
+
+            <div role="tablist" aria-label="Payment method" className="flex gap-1 px-2 pt-2 sm:px-3">
+                {order.map((key) => {
+                    const cfg = PAYMENT_METHODS[key];
+                    const isActive = activeKey === key;
+                    return (
+                        <button
+                            key={key}
+                            type="button"
+                            role="tab"
+                            id={`payment-tab-${key}`}
+                            aria-selected={isActive}
+                            aria-controls={`payment-tabpanel-${key}`}
+                            tabIndex={isActive ? 0 : -1}
+                            onClick={() => onChange(key)}
+                            className={`flex-1 rounded-t-xl px-4 py-2.5 text-sm font-extrabold uppercase tracking-wider transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-ink focus-visible:ring-offset-2 ${
+                                isActive
+                                    ? `${cfg.primaryClass} text-white shadow-sm`
+                                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            }`}
+                        >
+                            {cfg.label}
+                        </button>
+                    );
+                })}
+            </div>
+
+            {order.map((key) => (
+                <PaymentGuidePanel
+                    key={key}
+                    cfg={PAYMENT_METHODS[key]}
+                    total={total}
+                    isActive={activeKey === key}
+                />
+            ))}
+        </section>
+    );
+}
+
+function PaymentGuidePanel({ cfg, total, isActive }) {
+    const totalText = formatBDT(total);
+    if (!isActive) {
+        // Rendered once but hidden — keeps the DOM stable so Inertia-driven
+        // re-renders don't drop copy-button state mid-copy.
+        return (
+            <div
+                role="tabpanel"
+                id={`payment-tabpanel-${cfg.key}`}
+                aria-labelledby={`payment-tab-${cfg.key}`}
+                hidden
+                className="hidden"
+            />
+        );
+    }
 
     const ussdSteps = [
-        'আপনার মোবাইল ফোনের ডায়ালার থেকে *247# ডায়াল করে কল/সেন্ড করুন।',
+        `${cfg.ussdStepsPrefix} ${cfg.ussdCode} ডায়াল করে কল/সেন্ড করুন।`,
         'মেনু থেকে "Send Money" অপশনটি সিলেক্ট করুন।',
-        `প্রাপকের বিকাশ পার্সোনাল নম্বর দিন: ${BKASH_NUMBER}।`,
+        `${cfg.recipientLabel.replace(/:$/, '')} ${PAYMENT_NUMBER}।`,
         `টাকার পরিমাণ লিখুন: ${totalText} (আপনার মোট ফি)।`,
-        'আপনার বিকাশ পিন নম্বর দিয়ে কনফার্ম করুন।',
+        cfg.pinLabel,
         'স্ক্রিনে Transaction ID দেখাবে — সেটা নিচের ফর্মে লিখুন।',
     ];
 
     const appSteps = [
-        'আপনার মোবাইলে bKash অ্যাপটি ওপেন করুন (লগইন পিন দিয়ে)।',
+        cfg.appIntro,
         'হোম স্ক্রিন থেকে "Send Money" বাটনে ট্যাপ করুন।',
-        `প্রাপকের নম্বর হিসেবে লিখুন: ${BKASH_NUMBER} (বিকাশ পার্সোনাল নম্বর)।`,
+        `প্রাপকের নম্বর হিসেবে লিখুন: ${PAYMENT_NUMBER} ${cfg.appNumberSuffix}`,
         `"Next" চাপুন, তারপর টাকার পরিমাণ লিখুন: ${totalText} (আপনার মোট ফি)।`,
-        '"Send" বাটনে ট্যাপ করে আপনার বিকাশ পিন দিন।',
+        `"Send" বাটনে ট্যাপ করে ${cfg.pin} দিন।`,
         `কনফার্মেশন স্ক্রিন থেকে Transaction ID কপি করে নিচের ফর্মে লিখুন (মোট পাঠানো টাকা: ${totalText})।`,
     ];
 
     return (
-        <section
-            aria-labelledby="bkash-guide-heading"
-            className="rounded-2xl border-2 border-pink-300 bg-pink-50 p-5 shadow-md sm:p-6"
+        <div
+            role="tabpanel"
+            id={`payment-tabpanel-${cfg.key}`}
+            aria-labelledby={`payment-tab-${cfg.key}`}
+            className={cfg.panelClass + ' rounded-t-none border-0 shadow-none sm:p-6'}
         >
             <div className="flex items-start justify-between gap-3">
-                <h2 id="bkash-guide-heading" className="text-lg font-extrabold text-pink-900">
-                    কীভাবে বিকাশে টাকা পাঠাবেন
-                </h2>
-                <span className="inline-flex items-center rounded-full bg-pink-700 px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-white">
-                    bKash
+                <h3 id={cfg.panelTitleId} className={cfg.titleClass}>
+                    {cfg.title}
+                </h3>
+                <span
+                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-wider text-white ${cfg.primaryClass}`}
+                >
+                    {cfg.label}
                 </span>
             </div>
 
-            <div className="mt-4 rounded-xl border border-pink-300 bg-white/80 p-4">
-                <p className="text-sm font-semibold text-pink-900">
-                    আপনাকে যে পরিমাণ পাঠাতে হবে:
-                </p>
-                <p className="mt-1 font-mono text-3xl font-extrabold tracking-wide text-pink-700">
-                    {totalText}
-                </p>
-                <p className="mt-3 text-sm font-semibold text-pink-900">
-                    প্রাপকের বিকাশ পার্সোনাল নম্বর:
-                </p>
+            <div className={cfg.amountCardClass}>
+                <p className={cfg.amountLabelClass}>আপনাকে যে পরিমাণ পাঠাতে হবে:</p>
+                <p className={cfg.amountValueClass}>{totalText}</p>
+                <p className={`mt-3 ${cfg.recipientLabelClass}`}>{cfg.recipientLabel}</p>
                 <div className="mt-1 flex items-center gap-2">
-                    <p className="font-mono text-2xl font-extrabold tracking-widest text-pink-700 select-all">
-                        {BKASH_NUMBER}
-                    </p>
-                    <CopyButton value={BKASH_NUMBER} label="Copy bKash number" />
+                    <p className={cfg.numberClass}>{PAYMENT_NUMBER}</p>
+                    <CopyButton value={PAYMENT_NUMBER} label={`Copy ${cfg.label} number`} />
                 </div>
-                <p className="mt-1 text-xs text-pink-800">
+                <p className={cfg.hintClass}>
                     উপরের নম্বরে ঠিক {totalText} Send Money করুন — অন্য কোনো অপশন (Payment, Cash Out ইত্যাদি)
                     ব্যবহার করবেন না।
                 </p>
             </div>
 
-            <div className="mt-5 rounded-xl border border-pink-200 bg-white/70 p-4">
-                <GuideHeader method="পদ্ধতি ১: *247# ডায়াল করে পাঠান" badge="USSD" />
-                <GuideSteps steps={ussdSteps} />
+            <div className={cfg.stepBoxClass}>
+                <div className="flex items-start justify-between gap-3">
+                    <h4 className="text-base font-bold text-gray-900">{cfg.ussdHeading}</h4>
+                    <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-gray-700">
+                        USSD
+                    </span>
+                </div>
+                <GuideSteps steps={ussdSteps} className={cfg.stepsClass} />
             </div>
 
-            <div className="mt-4 rounded-xl border border-pink-200 bg-white/70 p-4">
-                <GuideHeader method="পদ্ধতি ২: বিকাশ অ্যাপ থেকে পাঠান" badge="App" />
-                <GuideSteps steps={appSteps} />
+            <div className={cfg.stepBoxClass}>
+                <div className="flex items-start justify-between gap-3">
+                    <h4 className="text-base font-bold text-gray-900">{cfg.appHeading}</h4>
+                    <span className="inline-flex items-center rounded-full bg-gray-200 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide text-gray-700">
+                        App
+                    </span>
+                </div>
+                <GuideSteps steps={appSteps} className={cfg.stepsClass} />
             </div>
 
-            <p className="mt-5 rounded-xl bg-pink-700 px-4 py-3 text-sm font-semibold text-white shadow-sm">
+            <p className={cfg.warnClass}>
                 <span aria-hidden="true">⚠️</span> গুরুত্বপূর্ণ: ঠিক {totalText} Send Money করুন, তারপর যে
                 Transaction ID পাবেন এবং যে মোবাইল নম্বর থেকে পাঠিয়েছেন — দুটোই নিচের ফর্মে অবশ্যই লিখুন।
                 Transaction ID ছাড়া পেমেন্ট যাচাই করা সম্ভব হবে না।
             </p>
-        </section>
+        </div>
     );
 }
 
@@ -829,6 +955,7 @@ function TicketPreview({ registration, formatBDT }) {
 }
 
 export default function Payment({ registration, latestPaymentStatus, showForm, flash }) {
+    const [activePayMethod, setActivePayMethod] = useState('bkash');
     const [paying, setPaying] = useState(false);
     const [downloadingTicket, setDownloadingTicket] = useState(false);
     const [ticketStatus, setTicketStatus] = useState(null);
@@ -847,6 +974,11 @@ export default function Payment({ registration, latestPaymentStatus, showForm, f
         send_from_mobile_number: '',
         notes: '',
     });
+
+    const setActivePayMethodSynced = (key) => {
+        setActivePayMethod(key);
+        form.setData('payment_method', key);
+    };
 
     const submit = (e) => {
         e.preventDefault();
@@ -942,10 +1074,17 @@ export default function Payment({ registration, latestPaymentStatus, showForm, f
 
                     {canMakePayment && !paying ? (
                         <>
-                            <BkashGuide total={registration.total_fee} />
+                            <PaymentTabs
+                                total={registration.total_fee}
+                                activeKey={activePayMethod}
+                                onChange={setActivePayMethodSynced}
+                            />
                             <button
                                 type="button"
-                                onClick={() => setPaying(true)}
+                                onClick={() => {
+                                    form.setData('payment_method', activePayMethod);
+                                    setPaying(true);
+                                }}
                                 className="inline-flex w-full min-h-12 items-center justify-center gap-2 rounded-2xl bg-linear-to-r from-brand to-brand-ink px-6 py-3 text-base font-bold text-black shadow-glow transition duration-200 hover:brightness-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-ink focus-visible:ring-offset-2"
                             >
                                 Make Payment
@@ -966,18 +1105,30 @@ export default function Payment({ registration, latestPaymentStatus, showForm, f
                             <div className="mt-4 space-y-4">
                                 <div>
                                     <label htmlFor="payment_method" className="mb-1 block text-sm font-semibold text-gray-700">
-                                        Method
+                                        Method <span aria-hidden="true" className="ml-0.5 text-red-600">*</span>
                                     </label>
-                                    <input
+                                    <select
                                         id="payment_method"
-                                        type="text"
-                                        value="bKash Send Money"
-                                        readOnly
-                                        aria-readonly="true"
-                                        className="block w-full min-h-12 cursor-not-allowed rounded-xl border border-gray-200 bg-gray-50 px-3 py-2.5 text-base text-gray-700 focus:outline-none"
-                                    />
+                                        required
+                                        value={form.data.payment_method}
+                                        onChange={(e) => form.setData('payment_method', e.target.value)}
+                                        className="block w-full min-h-12 rounded-xl border border-gray-200 px-3 py-2.5 text-base text-gray-900 focus:border-brand-ink focus:ring-2 focus:ring-brand-ink/30 focus:outline-none"
+                                    >
+                                        <option value="bkash">bKash Send Money</option>
+                                        <option value="nagad">Nagad Send Money</option>
+                                    </select>
                                     <p className="mt-1 text-xs text-gray-500">
-                                        Send to <span className="font-mono font-bold text-pink-700">{BKASH_NUMBER}</span> (bKash personal number).
+                                        Send Money করুন{' '}
+                                        <span
+                                            className={`font-mono font-bold ${
+                                                form.data.payment_method === 'nagad'
+                                                    ? 'text-orange-700'
+                                                    : 'text-pink-700'
+                                            }`}
+                                        >
+                                            {PAYMENT_NUMBER}
+                                        </span>{' '}
+                                        ({form.data.payment_method === 'nagad' ? 'Nagad' : 'bKash'} personal number).
                                     </p>
                                 </div>
                                 <div>
@@ -1000,7 +1151,7 @@ export default function Payment({ registration, latestPaymentStatus, showForm, f
                                 </div>
                                 <div>
                                     <label htmlFor="transaction_id" className="mb-1 block text-sm font-semibold text-gray-700">
-                                        bKash Transaction ID <span aria-hidden="true" className="ml-0.5 text-red-600">*</span>
+                                        {form.data.payment_method === 'nagad' ? 'Nagad' : 'bKash'} Transaction ID <span aria-hidden="true" className="ml-0.5 text-red-600">*</span>
                                     </label>
                                     <input
                                         id="transaction_id"

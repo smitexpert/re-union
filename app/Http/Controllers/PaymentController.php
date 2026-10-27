@@ -8,10 +8,11 @@ use App\Models\ReunionRegistration;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class PaymentController extends Controller
 {
-    public function show(string $registration): Response|RedirectResponse
+    public function show(string $registration): Response|RedirectResponse|SymfonyResponse
     {
         $reg = ReunionRegistration::query()
             ->with(['reunion', 'student', 'guests'])
@@ -19,8 +20,14 @@ class PaymentController extends Controller
             ->first();
 
         if (! $reg) {
-            abort(404);
+            return Inertia::render('NotFound', [
+                'reason' => 'registration_not_found',
+                'attemptedCode' => $registration,
+                'paymentLookupUrl' => route('payments.lookup'),
+            ])->toResponse(request())->setStatusCode(404);
         }
+
+        // Dummy change to satisfy simultaneous edits.
 
         $latestPayment = $reg->payments()->orderByDesc('id')->first();
         $rawStatus = $latestPayment?->status;

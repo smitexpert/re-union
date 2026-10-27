@@ -15,6 +15,7 @@ class ReunionsTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('id', 'desc')
             ->columns([
                 TextColumn::make('title')
                     ->searchable()
@@ -29,6 +30,19 @@ class ReunionsTable
                 TextColumn::make('registration_fee')
                     ->money('BDT')
                     ->sortable(),
+                TextColumn::make('charge_value')
+                    ->label('Service charge')
+                    ->placeholder('-')
+                    ->formatStateUsing(function ($state, $record) {
+                        if (! $record->isChargeEnabled()) {
+                            return null;
+                        }
+
+                        return $record->charge_type === 'percentage'
+                            ? $state.'%'
+                            : '৳'.number_format((float) $state, 2);
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
                 IconColumn::make('is_active')
                     ->boolean(),
                 TextColumn::make('created_at')

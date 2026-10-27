@@ -15,7 +15,7 @@ class StorePaymentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'payment_method' => ['required', Rule::in(['bkash'])],
+            'payment_method' => ['required', Rule::in(['bkash', 'nagad'])],
             'amount' => ['required', 'numeric', 'min:1'],
             'transaction_id' => ['required', 'string', 'max:100'],
             'send_from_mobile_number' => ['required', 'string', 'max:20'],

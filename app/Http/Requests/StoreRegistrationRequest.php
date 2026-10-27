@@ -23,8 +23,8 @@ class StoreRegistrationRequest extends FormRequest
             'student.session' => ['required', 'string', 'max:255'],
             'student.current_occupation' => ['required', 'string', 'max:150'],
             'student.present_address' => ['required', 'string'],
-            'student.permanent_address' => ['required', 'string'],
-            'student.office_address' => ['required', 'string'],
+            'student.permanent_address' => ['nullable', 'string'],
+            'student.office_address' => ['nullable', 'string'],
             // The frontend submits the photo as `student[photo]` (see
             // Wizard's buildFormData). PHP/Symfony promote that bracketed
             // name into a nested UploadedFile, which Laravel validates via

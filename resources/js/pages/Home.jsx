@@ -6,6 +6,7 @@ import Footer from '@/components/landing/Footer';
 import StickyCta from '@/components/landing/StickyCta';
 
 const REGISTER_URL = '/register';
+const PAYMENT_LOOKUP_URL = '/payments';
 
 export default function Home() {
     return (
@@ -23,13 +24,19 @@ export default function Home() {
                 >
                     Skip to content
                 </a>
-                <Header registerUrl={REGISTER_URL} />
+                <Header registerUrl={REGISTER_URL} paymentLookupUrl={PAYMENT_LOOKUP_URL} />
                 <main id="main">
-                    <Hero registerUrl={REGISTER_URL} />
+                    <Hero
+                        registerUrl={REGISTER_URL}
+                        paymentLookupUrl={PAYMENT_LOOKUP_URL}
+                    />
                     <About />
                 </main>
                 <Footer />
-                <StickyCta registerUrl={REGISTER_URL} />
+                <StickyCta
+                    registerUrl={REGISTER_URL}
+                    paymentLookupUrl={PAYMENT_LOOKUP_URL}
+                />
             </div>
         </>
     );

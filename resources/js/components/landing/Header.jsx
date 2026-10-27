@@ -9,7 +9,7 @@ const LINKS = [
 const focusRing =
     'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-ink focus-visible:ring-offset-2';
 
-export default function Header({ registerUrl }) {
+export default function Header({ registerUrl, paymentLookupUrl }) {
     const [open, setOpen] = useState(false);
     const toggleRef = useRef(null);
 
@@ -56,6 +56,12 @@ export default function Header({ registerUrl }) {
                         className={`hidden rounded-full bg-brand px-5 py-2 text-sm font-bold text-black transition duration-200 hover:brightness-95 active:scale-[0.98] sm:inline-flex ${focusRing}`}
                     >
                         Register
+                    </Link>
+                    <Link
+                        href={paymentLookupUrl}
+                        className={`hidden rounded-full border border-gray-200 px-5 py-2 text-sm font-semibold text-gray-700 transition duration-200 hover:bg-mist sm:inline-flex ${focusRing}`}
+                    >
+                        Find registration
                     </Link>
                     <button
                         ref={toggleRef}
@@ -110,6 +116,15 @@ export default function Header({ registerUrl }) {
                                 className={`block rounded-xl bg-brand px-3 py-3 text-center text-sm font-bold text-black transition duration-200 hover:brightness-95 ${focusRing}`}
                             >
                                 Register Now
+                            </Link>
+                        </li>
+                        <li className="sm:hidden">
+                            <Link
+                                href={paymentLookupUrl}
+                                onClick={() => setOpen(false)}
+                                className={`block rounded-xl border border-gray-200 px-3 py-3 text-center text-sm font-semibold text-gray-700 transition duration-200 hover:bg-mist ${focusRing}`}
+                            >
+                                Find registration
                             </Link>
                         </li>
                     </ul>

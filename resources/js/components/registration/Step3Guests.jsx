@@ -1,22 +1,20 @@
 import { formatBDT } from '@/components/registration/utils/format';
+import {
+    computeFeeLines,
+    computeServiceCharge,
+    serviceChargeLabel,
+} from '@/components/registration/utils/fee';
 
 export default function Step3Guests({ data, setData, errors, feeBreakdown }) {
     const update = (field) => (e) => setData(field, e.target.value);
+    const adultCount = Number(data.guest_count_adult || 0);
+    const childCount = Number(data.guest_count_child || 0);
+    const feeLines = computeFeeLines(feeBreakdown, adultCount, childCount);
+    const subtotal = feeLines.reduce((sum, line) => sum + line.amount, 0);
+    const chargeAmount = computeServiceCharge(feeBreakdown, subtotal);
+    const chargeLabel = serviceChargeLabel(feeBreakdown);
+    const total = subtotal + chargeAmount;
     const perHead = feeBreakdown.perHead || {};
-    const subtotal = Number(feeBreakdown.subtotal ?? feeBreakdown.base ?? 0);
-    const chargeAmount = Number(feeBreakdown.chargeAmount ?? 0);
-    const chargeType = feeBreakdown.chargeType ?? null;
-    const chargeValue = Number(feeBreakdown.chargeValue ?? 0);
-    const total = Number(feeBreakdown.total ?? subtotal);
-
-    // Live recompute of subtotal from per-head fees when the breakdown lacks
-    // a `subtotal` key (older shape). New breakdowns always include it.
-    const localSubtotal =
-        Number(feeBreakdown.base || 0) +
-        (perHead.Adult ? perHead.Adult * Number(data.guest_count_adult || 0) : 0) +
-        (perHead.Child ? perHead.Child * Number(data.guest_count_child || 0) : 0);
-    const resolvedSubtotal = feeBreakdown.subtotal != null ? subtotal : localSubtotal;
-    const resolvedTotal = feeBreakdown.total != null ? total : resolvedSubtotal + chargeAmount;
 
     return (
         <div className="space-y-4">
@@ -79,19 +77,25 @@ export default function Step3Guests({ data, setData, errors, feeBreakdown }) {
             </div>
 
             <div className="space-y-1 rounded-2xl bg-brand/10 px-4 py-3 text-sm font-semibold text-brand-ink">
-                <div className="flex justify-between">
+                {feeLines.map((line) => (
+                    <div key={line.key} className="flex justify-between">
+                        <span>{line.label}</span>
+                        <span>{formatBDT(line.amount)}</span>
+                    </div>
+                ))}
+                <div className="flex justify-between border-t border-brand/30 pt-1">
                     <span>Subtotal</span>
-                    <span>{formatBDT(resolvedSubtotal)}</span>
+                    <span>{formatBDT(subtotal)}</span>
                 </div>
-                {chargeType ? (
+                {chargeLabel ? (
                     <div className="flex justify-between">
-                        <span>Service Charge ({chargeType === 'percentage' ? `${chargeValue}%` : 'flat'})</span>
+                        <span>{chargeLabel}</span>
                         <span>{formatBDT(chargeAmount)}</span>
                     </div>
                 ) : null}
                 <div className="flex justify-between border-t border-brand/30 pt-1 text-base">
                     <span>Estimated total</span>
-                    <span>{formatBDT(resolvedTotal)}</span>
+                    <span>{formatBDT(total)}</span>
                 </div>
             </div>
         </div>

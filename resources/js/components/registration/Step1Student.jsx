@@ -95,7 +95,6 @@ export default function Step1Student({ data, setData, errors }) {
                 value={data.student.permanent_address}
                 onChange={updateStudent('permanent_address')}
                 error={errors['student.permanent_address']}
-                required
             />
             <TextAreaInput
                 id="student.office_address"
@@ -103,7 +102,6 @@ export default function Step1Student({ data, setData, errors }) {
                 value={data.student.office_address}
                 onChange={updateStudent('office_address')}
                 error={errors['student.office_address']}
-                required
             />
 
             <div>
