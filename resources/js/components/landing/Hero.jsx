@@ -42,7 +42,7 @@ export default function Hero({ registerUrl, paymentLookupUrl }) {
                 </p>
 
                 <h1 className="mt-5 text-4xl font-bold leading-tight tracking-tight text-balance sm:text-5xl">
-                    Reconnect | Reflect | Rejoice:{' '}
+                    Reconnect | Reflect | Rejoice{' '}
                     <span className="text-brand-ink">SWAATC Reunion</span>
                 </h1>
 
