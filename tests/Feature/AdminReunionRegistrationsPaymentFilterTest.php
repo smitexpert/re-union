@@ -145,11 +145,33 @@ class AdminReunionRegistrationsPaymentFilterTest extends TestCase
             ->assertCanSeeTableRecords([$matched, $unmatched]);
     }
 
+    public function test_registrations_without_any_payment_stay_in_the_list(): void
+    {
+        $reunion = Reunion::factory()->create();
+        $registration = $this->registrationFor($reunion, 'Ayesha Siddiqua');
+
+        $this->table($reunion)
+            ->assertCanSeeTableRecords([$registration]);
+    }
+
+    public function test_registrations_without_any_payment_stay_in_the_list_while_the_filter_is_blank(): void
+    {
+        $reunion = Reunion::factory()->create();
+        $registration = $this->registrationFor($reunion, 'Ayesha Siddiqua');
+
+        $this->table($reunion)
+            ->filterTable('payment', [
+                'transaction_id' => '',
+                'send_from_mobile_number' => '',
+            ])
+            ->assertCanSeeTableRecords([$registration]);
+    }
+
     public function test_payment_filter_does_not_match_registrations_of_other_reunions(): void
     {
         $reunion = Reunion::factory()->create();
         $otherReunion = Reunion::factory()->create();
-        [$matched, $unmatched] = $this->registrations($reunion);
+        [$matched] = $this->registrations($reunion);
 
         $otherRegistration = $this->registrationFor($otherReunion, 'Tanvir Ahmed');
         Payment::factory()->create([

@@ -125,11 +125,17 @@ class RegistrationsRelationManager extends RelationManager
                         TextInput::make('send_from_mobile_number')
                             ->label('Send From'),
                     ])
-                    ->query(fn (Builder $query, array $data): Builder => $query
-                        ->whereHas('payments', function (Builder $query) use ($data): Builder {
-                            $transactionId = $data['transaction_id'] ?? null;
-                            $sendFromMobileNumber = $data['send_from_mobile_number'] ?? null;
+                    ->query(function (Builder $query, array $data): Builder {
+                        $transactionId = $data['transaction_id'] ?? null;
+                        $sendFromMobileNumber = $data['send_from_mobile_number'] ?? null;
 
+                        // Both fields empty means "no filter", so the registrations
+                        // without any payment must stay in the list.
+                        if (blank($transactionId) && blank($sendFromMobileNumber)) {
+                            return $query;
+                        }
+
+                        return $query->whereHas('payments', function (Builder $query) use ($transactionId, $sendFromMobileNumber): Builder {
                             return $query
                                 ->when(
                                     filled($transactionId),
@@ -139,8 +145,8 @@ class RegistrationsRelationManager extends RelationManager
                                     filled($sendFromMobileNumber),
                                     fn (Builder $query): Builder => $query->where('send_from_mobile_number', 'like', "%{$sendFromMobileNumber}%"),
                                 );
-                        }),
-                    ),
+                        });
+                    }),
                 SelectFilter::make('registration_status')
                     ->options([
                         'pending' => 'Pending',
