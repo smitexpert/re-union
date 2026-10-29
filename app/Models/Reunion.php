@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Reunion extends Model
 {
@@ -44,6 +45,19 @@ class Reunion extends Model
     public function registrations(): HasMany
     {
         return $this->hasMany(ReunionRegistration::class);
+    }
+
+    /**
+     * Every payment made against any registration of this reunion.
+     */
+    public function payments(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            Payment::class,
+            ReunionRegistration::class,
+            'reunion_id',
+            'registration_id',
+        );
     }
 
     public static function currentOpenForRegistration(): ?self

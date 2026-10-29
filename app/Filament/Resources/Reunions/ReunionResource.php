@@ -7,6 +7,7 @@ use App\Filament\Resources\Reunions\Pages\EditReunion;
 use App\Filament\Resources\Reunions\Pages\ListReunions;
 use App\Filament\Resources\Reunions\Pages\ViewReunion;
 use App\Filament\Resources\Reunions\RelationManagers\GuestFeesRelationManager;
+use App\Filament\Resources\Reunions\RelationManagers\PaymentsRelationManager;
 use App\Filament\Resources\Reunions\RelationManagers\RegistrationsRelationManager;
 use App\Filament\Resources\Reunions\Schemas\ReunionForm;
 use App\Filament\Resources\Reunions\Tables\ReunionsTable;
@@ -39,6 +40,7 @@ class ReunionResource extends Resource
     {
         return [
             RegistrationsRelationManager::class,
+            PaymentsRelationManager::class,
             GuestFeesRelationManager::class,
         ];
     }

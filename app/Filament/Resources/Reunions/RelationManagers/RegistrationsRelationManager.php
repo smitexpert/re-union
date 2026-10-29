@@ -14,8 +14,11 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Enums\FiltersLayout;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class RegistrationsRelationManager extends RelationManager
 {
@@ -114,6 +117,30 @@ class RegistrationsRelationManager extends RelationManager
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
+                Filter::make('payment')
+                    ->label('Payment')
+                    ->schema([
+                        TextInput::make('transaction_id')
+                            ->label('Transaction ID'),
+                        TextInput::make('send_from_mobile_number')
+                            ->label('Send From'),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->whereHas('payments', function (Builder $query) use ($data): Builder {
+                            $transactionId = $data['transaction_id'] ?? null;
+                            $sendFromMobileNumber = $data['send_from_mobile_number'] ?? null;
+
+                            return $query
+                                ->when(
+                                    filled($transactionId),
+                                    fn (Builder $query): Builder => $query->where('transaction_id', 'like', "%{$transactionId}%"),
+                                )
+                                ->when(
+                                    filled($sendFromMobileNumber),
+                                    fn (Builder $query): Builder => $query->where('send_from_mobile_number', 'like', "%{$sendFromMobileNumber}%"),
+                                );
+                        }),
+                    ),
                 SelectFilter::make('registration_status')
                     ->options([
                         'pending' => 'Pending',
@@ -127,6 +154,7 @@ class RegistrationsRelationManager extends RelationManager
                         'refunded' => 'Refunded',
                     ]),
             ])
+            ->filtersLayout(FiltersLayout::AboveContent)
             ->headerActions([
                 CreateAction::make(),
             ])
