@@ -95,6 +95,49 @@ class RegistrationStoreTest extends TestCase
         Storage::disk('public')->assertExists($student->photo);
     }
 
+    /**
+     * The photo the browser uploads is resized in the browser, but the server
+     * still has to accept a photo that is larger than the old 2 MB cap --
+     * otherwise nginx answers the submission with a 413 before this
+     * validation ever runs.
+     */
+    public function test_registration_accepts_a_photo_larger_than_two_megabytes(): void
+    {
+        $reunion = Reunion::create([
+            'title' => 'Test Reunion',
+            'event_date' => now()->addDays(30)->toDateString(),
+            'registration_deadline' => now()->addDays(7)->toDateString(),
+            'is_active' => true,
+            'registration_fee' => 500,
+        ]);
+
+        $payload = $this->basePayload();
+        // 3 MB: above the old 2 MB cap, inside the 5 MB the app accepts.
+        $payload['student']['photo'] = UploadedFile::fake()->image('headshot.jpg', 600, 600)->size(3000);
+
+        $response = $this->post('/register', $payload);
+
+        $response->assertSessionDoesntHaveErrors(['student.photo']);
+    }
+
+    public function test_registration_rejects_a_photo_larger_than_five_megabytes(): void
+    {
+        $reunion = Reunion::create([
+            'title' => 'Test Reunion',
+            'event_date' => now()->addDays(30)->toDateString(),
+            'registration_deadline' => now()->addDays(7)->toDateString(),
+            'is_active' => true,
+            'registration_fee' => 500,
+        ]);
+
+        $payload = $this->basePayload();
+        $payload['student']['photo'] = UploadedFile::fake()->image('headshot.jpg', 600, 600)->size(6000);
+
+        $response = $this->post('/register', $payload);
+
+        $response->assertSessionHasErrors(['student.photo']);
+    }
+
     public function test_registration_rejects_missing_photo(): void
     {
         $reunion = Reunion::create([

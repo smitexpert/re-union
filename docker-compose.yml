@@ -6,8 +6,21 @@ services:
     dns:
       - 8.8.8.8
       - 8.8.4.4
+    # The image ships no php.ini and its entrypoint is a stub that does not
+    # honour the PHP_VALUE env var, so the limits have to be handed to
+    # php-fpm directly. post_max_size stays above nginx's
+    # client_max_body_size (8m) so PHP never discards a body it cannot
+    # parse -- that would surface as a CSRF 419 instead of a validation
+    # error.
+    command:
+      - php-fpm
+      - -d
+      - memory_limit=512M
+      - -d
+      - upload_max_filesize=8M
+      - -d
+      - post_max_size=16M
     environment:
-      - PHP_VALUE=memory_limit=512M
       - PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
       # Compiled views must live outside the shared volume: the fpm pool runs
       # as www-data, and it cannot utime files owned by the host user.

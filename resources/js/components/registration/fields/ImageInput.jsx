@@ -1,9 +1,14 @@
 import { useEffect, useId, useRef, useState } from 'react';
+import { preparePhoto } from '@/components/registration/utils/image';
 
 /**
  * File-picker field with a square preview. Works for the registration form's
  * student photo. `value` may be a File (newly picked) or null; once picked,
  * a local object URL is shown in the preview until the parent clears it.
+ *
+ * The picked photo is resized in the browser before it is handed to the
+ * parent, so phone photos arrive small enough for the server's upload
+ * limits. See utils/image.js.
  */
 export default function ImageInput({
     id,
@@ -19,6 +24,12 @@ export default function ImageInput({
     const fieldId = id || `image-input-${reactId}`;
     const inputRef = useRef(null);
     const [previewUrl, setPreviewUrl] = useState(null);
+    const [localError, setLocalError] = useState(null);
+    const [processing, setProcessing] = useState(false);
+
+    // Resizing is asynchronous, so a slow pick must not overwrite a newer
+    // one. Each pick takes a number and only the latest one wins.
+    const pickNumber = useRef(0);
 
     // Keep the preview URL in sync with the value (covers clearing the file
     // after a successful submit, or replacing it with a different one).
@@ -32,15 +43,56 @@ export default function ImageInput({
         return () => URL.revokeObjectURL(url);
     }, [value]);
 
-    const handlePick = (e) => {
+    const handlePick = async (e) => {
         const file = e.target.files?.[0] ?? null;
-        onChange(file);
+        if (!file) {
+            onChange(null);
+            return;
+        }
+
+        const currentPick = ++pickNumber.current;
+        setProcessing(true);
+
+        try {
+            const { file: prepared, error: prepareError } = await preparePhoto(file);
+
+            if (currentPick !== pickNumber.current) {
+                // A newer pick has been made in the meantime.
+                return;
+            }
+
+            if (prepareError) {
+                setLocalError(prepareError);
+                onChange(null);
+                // Let the user pick the same file again once they fix it.
+                if (inputRef.current) inputRef.current.value = '';
+                return;
+            }
+
+            setLocalError(null);
+            onChange(prepared);
+        } catch {
+            // preparePhoto guards against its own failures, but a browser
+            // that cannot give us a canvas should not leave the field stuck.
+            if (currentPick === pickNumber.current) {
+                setLocalError('That photo could not be read. Please choose a different one.');
+                onChange(null);
+            }
+        } finally {
+            if (currentPick === pickNumber.current) {
+                setProcessing(false);
+            }
+        }
     };
 
     const handleClear = () => {
+        pickNumber.current += 1;
         if (inputRef.current) inputRef.current.value = '';
+        setLocalError(null);
         onChange(null);
     };
+
+    const displayError = localError ?? error;
 
     return (
         <div className={className}>
@@ -89,10 +141,11 @@ export default function ImageInput({
                         accept={accept}
                         onChange={handlePick}
                         required={required}
+                        disabled={processing}
                         aria-required={required ? 'true' : undefined}
-                        aria-invalid={error ? 'true' : 'false'}
-                        aria-describedby={error ? `${fieldId}-error` : undefined}
-                        className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-ink file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:brightness-110 focus:outline-none"
+                        aria-invalid={displayError ? 'true' : 'false'}
+                        aria-describedby={displayError ? `${fieldId}-error` : undefined}
+                        className="block w-full text-sm text-gray-700 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-ink file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:brightness-110 focus:outline-none disabled:cursor-wait disabled:opacity-60"
                     />
                     {value ? (
                         <button
@@ -103,14 +156,18 @@ export default function ImageInput({
                             Remove
                         </button>
                     ) : (
-                        <p className="text-xs text-gray-500">PNG, JPG or WebP up to 2 MB.</p>
+                        <p className="text-xs text-gray-500">
+                            {processing
+                                ? 'Resizing photo…'
+                                : 'PNG, JPG or WebP. Large photos are resized automatically.'}
+                        </p>
                     )}
                 </div>
             </div>
 
-            {error ? (
+            {displayError ? (
                 <p id={`${fieldId}-error`} className="mt-1 text-sm text-red-600">
-                    {error}
+                    {displayError}
                 </p>
             ) : null}
         </div>

@@ -30,7 +30,12 @@ class StoreRegistrationRequest extends FormRequest
             // name into a nested UploadedFile, which Laravel validates via
             // dot notation — so the rule lives at `student.photo`, not at a
             // top-level `photo` key.
-            'student.photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            //
+            // 5 MB mirrors the server-side upload ceiling (nginx
+            // `client_max_body_size` / PHP `upload_max_filesize`). The
+            // browser resizes photos before sending them, so this is only a
+            // backstop for uploads that arrive uncompressed.
+            'student.photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
 
             'tshirt_size' => ['required', 'string', 'max:10'],
             'guest_count_adult' => ['required', 'integer', 'min:0'],
